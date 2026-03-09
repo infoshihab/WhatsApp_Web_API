@@ -2,9 +2,9 @@ require("dotenv").config();
 
 const http = require("http");
 const app = require("./src/app");
-const { initializeSocket } = require("./src/socket/socketHandler");
-const { initializeClient } = require("./src/services/whatsappService");
-const logger = require("./src/config/logger");
+const { initializeSocket } = require("./src/socket/sockethandler.js");
+const { initializeClient } = require("./src/services/whatsappService.js");
+const logger = require("./src/config/logger.js");
 
 const PORT = process.env.PORT || 3000;
 

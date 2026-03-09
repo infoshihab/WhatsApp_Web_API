@@ -7,17 +7,17 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const path = require("path");
 
-const logger = require("./config/logger");
-const { generalLimiter } = require("./middlewares/rateLimiter");
+const logger = require("./config/logger.js");
+const { generalLimiter } = require("./middlewares/rateLimiter.js");
 const {
   notFoundHandler,
   globalErrorHandler,
-} = require("./middlewares/errorHandler");
+} = require("./middlewares/errorHandler.js");
 
 // ── Route imports ──────────────────────────────
-const healthRoutes = require("./routes/healthRoutes");
-const whatsappRoutes = require("./routes/whatsappRoutes");
-const messageRoutes = require("./routes/messageRoutes");
+// const healthRoutes = require("./routes/healthRoutes.js");
+// const whatsappRoutes = require("./routes/whatsappRoutes.js");
+const messageRoutes = require("./routes/messageRoutes.js");
 
 const app = express();
 
