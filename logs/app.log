@@ -1,0 +1,95 @@
+{"level":"info","message":"Socket.IO initialized successfully.","timestamp":"2026-03-10T17:00:02.143Z"}
+{"level":"info","message":"🚀 Server running on http://localhost:3000","timestamp":"2026-03-10T17:00:02.150Z"}
+{"level":"info","message":"📡 Socket.IO ready for real-time QR events","timestamp":"2026-03-10T17:00:02.150Z"}
+{"level":"info","message":"🌍 Environment: development","timestamp":"2026-03-10T17:00:02.151Z"}
+{"level":"info","message":"Starting WhatsApp client...","timestamp":"2026-03-10T17:00:02.151Z"}
+{"level":"info","message":"Initializing WhatsApp client...","timestamp":"2026-03-10T17:00:02.152Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:00:09.811Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:00:09.908Z"}
+{"level":"info","message":"Socket.IO initialized successfully.","timestamp":"2026-03-10T17:00:14.593Z"}
+{"level":"info","message":"🚀 Server running on http://localhost:3000","timestamp":"2026-03-10T17:00:14.597Z"}
+{"level":"info","message":"📡 Socket.IO ready for real-time QR events","timestamp":"2026-03-10T17:00:14.597Z"}
+{"level":"info","message":"🌍 Environment: development","timestamp":"2026-03-10T17:00:14.598Z"}
+{"level":"info","message":"Starting WhatsApp client...","timestamp":"2026-03-10T17:00:14.598Z"}
+{"level":"info","message":"Initializing WhatsApp client...","timestamp":"2026-03-10T17:00:14.599Z"}
+{"level":"http","message":"::1 - - [10/Mar/2026:17:00:19 +0000] \"GET / HTTP/1.1\" 200 284 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","timestamp":"2026-03-10T17:00:19.600Z"}
+{"level":"warn","message":"Route not found","method":"GET","path":"/favicon.ico","timestamp":"2026-03-10T17:00:19.779Z"}
+{"level":"http","message":"::1 - - [10/Mar/2026:17:00:19 +0000] \"GET /favicon.ico HTTP/1.1\" 404 66 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","timestamp":"2026-03-10T17:00:19.783Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:00:21.640Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:00:21.694Z"}
+{"level":"info","message":"Socket.IO initialized successfully.","timestamp":"2026-03-10T17:00:35.421Z"}
+{"level":"info","message":"🚀 Server running on http://localhost:3000","timestamp":"2026-03-10T17:00:35.426Z"}
+{"level":"info","message":"📡 Socket.IO ready for real-time QR events","timestamp":"2026-03-10T17:00:35.426Z"}
+{"level":"info","message":"🌍 Environment: development","timestamp":"2026-03-10T17:00:35.427Z"}
+{"level":"info","message":"Starting WhatsApp client...","timestamp":"2026-03-10T17:00:35.427Z"}
+{"level":"info","message":"Initializing WhatsApp client...","timestamp":"2026-03-10T17:00:35.428Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:00:41.580Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:00:41.639Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:01:41.444Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:01:41.480Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:02:01.457Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:02:01.479Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:02:21.466Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:02:21.485Z"}
+{"level":"http","message":"::1 - - [10/Mar/2026:17:02:34 +0000] \"GET /client.html HTTP/1.1\" 200 7905 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","timestamp":"2026-03-10T17:02:34.577Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:02:41.470Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:02:41.493Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:03:01.472Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:03:01.496Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:04:12.545Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:04:12.571Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:05:12.547Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:05:12.564Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:05:32.549Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:05:32.564Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:05:52.552Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:05:52.568Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:06:12.562Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:06:12.583Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:06:32.576Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:06:32.595Z"}
+{"level":"info","message":"Socket.IO initialized successfully.","timestamp":"2026-03-10T17:07:37.589Z"}
+{"level":"info","message":"🚀 Server running on http://localhost:3000","timestamp":"2026-03-10T17:07:37.593Z"}
+{"level":"info","message":"📡 Socket.IO ready for real-time QR events","timestamp":"2026-03-10T17:07:37.594Z"}
+{"level":"info","message":"🌍 Environment: development","timestamp":"2026-03-10T17:07:37.594Z"}
+{"level":"info","message":"Starting WhatsApp client...","timestamp":"2026-03-10T17:07:37.595Z"}
+{"level":"info","message":"Initializing WhatsApp client...","timestamp":"2026-03-10T17:07:37.595Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:07:45.609Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:07:45.683Z"}
+{"level":"http","message":"::1 - - [10/Mar/2026:17:08:00 +0000] \"GET /client.html HTTP/1.1\" 200 12763 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","timestamp":"2026-03-10T17:08:00.316Z"}
+{"level":"info","message":"SIGINT received. Shutting down gracefully...","timestamp":"2026-03-10T17:08:10.894Z"}
+{"level":"info","message":"Socket.IO initialized successfully.","timestamp":"2026-03-10T17:08:17.558Z"}
+{"level":"info","message":"🚀 Server running on http://localhost:3000","timestamp":"2026-03-10T17:08:17.561Z"}
+{"level":"info","message":"📡 Socket.IO ready for real-time QR events","timestamp":"2026-03-10T17:08:17.562Z"}
+{"level":"info","message":"🌍 Environment: development","timestamp":"2026-03-10T17:08:17.562Z"}
+{"level":"info","message":"Starting WhatsApp client...","timestamp":"2026-03-10T17:08:17.563Z"}
+{"level":"info","message":"Initializing WhatsApp client...","timestamp":"2026-03-10T17:08:17.563Z"}
+{"level":"http","message":"::1 - - [10/Mar/2026:17:08:23 +0000] \"GET /client.html HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","timestamp":"2026-03-10T17:08:23.171Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:08:24.080Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:08:24.132Z"}
+{"level":"http","message":"::1 - - [10/Mar/2026:17:08:25 +0000] \"GET /client.html HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","timestamp":"2026-03-10T17:08:25.087Z"}
+{"level":"http","message":"::1 - - [10/Mar/2026:17:08:25 +0000] \"GET /client.html HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","timestamp":"2026-03-10T17:08:25.790Z"}
+{"level":"warn","message":"Route not found","method":"GET","path":"/.well-known/appspecific/com.chrome.devtools.json","timestamp":"2026-03-10T17:08:32.576Z"}
+{"level":"http","message":"::1 - - [10/Mar/2026:17:08:32 +0000] \"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1\" 404 103 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\"","timestamp":"2026-03-10T17:08:32.580Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:09:23.958Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:09:23.996Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:09:43.965Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:09:44.002Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:10:03.975Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:10:03.995Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:10:23.981Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:10:24.005Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:10:43.994Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:10:44.010Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:11:55.192Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:11:55.211Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:12:55.198Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:12:55.216Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:13:15.201Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:13:15.218Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:13:35.208Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:13:35.224Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:13:55.223Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:13:55.241Z"}
+{"level":"info","message":"QR Code received. Waiting for scan...","timestamp":"2026-03-10T17:14:15.237Z"}
+{"level":"info","message":"QR Code emitted to Socket.IO clients.","timestamp":"2026-03-10T17:14:15.257Z"}

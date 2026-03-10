@@ -15,8 +15,8 @@ const {
 } = require("./middlewares/errorHandler.js");
 
 // ── Route imports ──────────────────────────────
-// const healthRoutes = require("./routes/healthRoutes.js");
-// const whatsappRoutes = require("./routes/whatsappRoutes.js");
+const healthRoutes = require("./routes/healthRoutes.js");
+const whatsappRoutes = require("./routes/whatsappRoutes.js");
 const messageRoutes = require("./routes/messageRoutes.js");
 
 const app = express();

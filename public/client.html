@@ -11,7 +11,6 @@
         margin: 0;
         padding: 0;
       }
-
       body {
         min-height: 100vh;
         display: flex;
@@ -21,29 +20,25 @@
         font-family: "Segoe UI", sans-serif;
         color: #e9edef;
       }
-
       .card {
         background: #202c33;
         border-radius: 16px;
         padding: 40px;
         text-align: center;
-        max-width: 420px;
+        max-width: 440px;
         width: 100%;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       }
-
       .logo {
         font-size: 48px;
         margin-bottom: 12px;
       }
-
       h1 {
         font-size: 22px;
         font-weight: 600;
         margin-bottom: 6px;
         color: #00a884;
       }
-
       p.subtitle {
         font-size: 14px;
         color: #8696a0;
@@ -55,15 +50,18 @@
         border-radius: 12px;
         padding: 16px;
         display: inline-block;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
+        min-width: 252px;
+        min-height: 252px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
-
       #qrImage {
         width: 220px;
         height: 220px;
-        display: block;
+        display: none;
       }
-
       #placeholder {
         width: 220px;
         height: 220px;
@@ -72,100 +70,128 @@
         justify-content: center;
         flex-direction: column;
         gap: 12px;
-        color: #8696a0;
       }
-
       .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #2a3942;
+        width: 44px;
+        height: 44px;
+        border: 4px solid #e0e0e0;
         border-top-color: #00a884;
         border-radius: 50%;
         animation: spin 0.9s linear infinite;
       }
-
       @keyframes spin {
         to {
           transform: rotate(360deg);
         }
+      }
+      .spinner-label {
+        font-size: 13px;
+        color: #8696a0;
       }
 
       .status-badge {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 16px;
+        padding: 8px 18px;
         border-radius: 20px;
         font-size: 13px;
         font-weight: 500;
-        margin-bottom: 20px;
+        margin-bottom: 12px;
       }
-
       .dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
       }
 
-      .status-waiting {
+      .s-waiting {
         background: #2a3942;
         color: #8696a0;
       }
-      .status-waiting .dot {
+      .s-waiting .dot {
         background: #8696a0;
+        animation: pulse 1.5s infinite;
       }
-
-      .status-ready {
-        background: #00332a;
-        color: #00a884;
-      }
-      .status-ready .dot {
-        background: #00a884;
-      }
-
-      .status-error {
-        background: #3b1a1a;
-        color: #f15c6d;
-      }
-      .status-error .dot {
-        background: #f15c6d;
-      }
-
-      .status-scanning {
+      .s-scanning {
         background: #1a2d3b;
         color: #53bdeb;
       }
-      .status-scanning .dot {
+      .s-scanning .dot {
         background: #53bdeb;
+      }
+      .s-ready {
+        background: #00332a;
+        color: #00a884;
+      }
+      .s-ready .dot {
+        background: #00a884;
+      }
+      .s-error {
+        background: #3b1a1a;
+        color: #f15c6d;
+      }
+      .s-error .dot {
+        background: #f15c6d;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
       }
 
       #statusMsg {
         font-size: 13px;
         color: #8696a0;
+        margin-bottom: 20px;
         line-height: 1.6;
       }
 
+      .retry-btn {
+        display: none;
+        background: #00a884;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 24px;
+        font-size: 14px;
+        cursor: pointer;
+        margin-bottom: 16px;
+      }
+      .retry-btn:hover {
+        background: #00c49a;
+      }
+
       .instructions {
-        margin-top: 24px;
         text-align: left;
         background: #111b21;
         border-radius: 8px;
         padding: 16px;
       }
-
       .instructions h3 {
-        font-size: 13px;
+        font-size: 12px;
         color: #8696a0;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
       }
-
       .instructions ol {
         padding-left: 18px;
         font-size: 13px;
         color: #aebac1;
-        line-height: 2;
+        line-height: 2.2;
+      }
+
+      .debug-bar {
+        margin-top: 16px;
+        font-size: 11px;
+        color: #3d5260;
+        text-align: center;
       }
     </style>
   </head>
@@ -176,130 +202,243 @@
       <p class="subtitle">Scan the QR code to connect your WhatsApp</p>
 
       <div class="qr-box">
-        <img id="qrImage" src="" alt="QR Code" style="display: none" />
+        <img id="qrImage" src="" alt="QR Code" />
         <div id="placeholder">
           <div class="spinner"></div>
-          <span style="font-size: 13px">Waiting for QR...</span>
+          <span class="spinner-label" id="spinnerLabel">Generating QR...</span>
         </div>
       </div>
 
       <br />
 
-      <div class="status-badge status-waiting" id="statusBadge">
+      <div class="status-badge s-waiting" id="statusBadge">
         <div class="dot"></div>
-        <span id="statusText">Connecting...</span>
+        <span id="statusText">Connecting to server...</span>
       </div>
 
-      <p id="statusMsg">Please wait while we connect to WhatsApp.</p>
+      <p id="statusMsg">Please wait while we initialize WhatsApp.</p>
+
+      <button class="retry-btn" id="retryBtn" onclick="requestQR()">
+        🔄 Request QR Again
+      </button>
 
       <div class="instructions">
-        <h3>How to scan</h3>
+        <h3>📱 How to scan</h3>
         <ol>
           <li>Open WhatsApp on your phone</li>
-          <li>Tap Menu (⋮) or Settings</li>
+          <li>Tap <strong>Menu (⋮)</strong> or <strong>Settings</strong></li>
           <li>Tap <strong>Linked Devices</strong></li>
           <li>Tap <strong>Link a Device</strong></li>
-          <li>Point your phone at this QR code</li>
+          <li>Point your phone at the QR code above</li>
         </ol>
       </div>
+
+      <div class="debug-bar" id="debugBar">Socket: connecting...</div>
     </div>
 
     <script>
-      const socket = io();
-      const qrImage = document.getElementById("qrImage");
+      const socket = io({ transports: ["websocket", "polling"] });
+      const qrImg = document.getElementById("qrImage");
       const placeholder = document.getElementById("placeholder");
-      const statusBadge = document.getElementById("statusBadge");
+      const spinnerLabel = document.getElementById("spinnerLabel");
+      const badge = document.getElementById("statusBadge");
       const statusText = document.getElementById("statusText");
       const statusMsg = document.getElementById("statusMsg");
+      const retryBtn = document.getElementById("retryBtn");
+      const debugBar = document.getElementById("debugBar");
 
-      function setStatus(type, text, msg) {
-        statusBadge.className = `status-badge status-${type}`;
-        statusText.textContent = text;
-        statusMsg.textContent = msg;
+      let qrReceived = false;
+
+      // ── Helpers ───────────────────────────────────
+      function showQR(src) {
+        qrImg.src = src;
+        qrImg.style.display = "block";
+        placeholder.style.display = "none";
+        qrReceived = true;
+        retryBtn.style.display = "none";
       }
 
-      // ── Receive QR code ────────────────────────
-      socket.on("qr", ({ qrImage: src }) => {
-        qrImage.src = src;
-        qrImage.style.display = "block";
-        placeholder.style.display = "none";
+      function showSpinner(label) {
+        qrImg.style.display = "none";
+        placeholder.style.display = "flex";
+        spinnerLabel.textContent = label || "Please wait...";
+      }
+
+      function showSuccess() {
+        qrImg.style.display = "none";
+        placeholder.innerHTML =
+          '<div style="font-size:64px">✅</div><span style="color:#00a884;font-size:15px;font-weight:600">Connected!</span>';
+        placeholder.style.display = "flex";
+      }
+
+      function setStatus(cls, text, msg, showRetry) {
+        badge.className = `status-badge ${cls}`;
+        statusText.textContent = text;
+        statusMsg.textContent = msg;
+        retryBtn.style.display = showRetry ? "inline-block" : "none";
+      }
+
+      function requestQR() {
+        socket.emit("get_status");
+        showSpinner("Requesting QR...");
         setStatus(
-          "scanning",
-          "Scan QR Code",
-          "Open WhatsApp on your phone and scan the QR code above.",
+          "s-waiting",
+          "Requesting QR...",
+          "Asking server for a fresh QR code.",
+          false,
+        );
+      }
+
+      // ── QR Code received ───────────────────────────
+      socket.on("qr", ({ qrImage }) => {
+        debugBar.textContent = "QR received ✓";
+        showQR(qrImage);
+        setStatus(
+          "s-scanning",
+          "📷 Scan QR Code",
+          "Open WhatsApp on your phone → Linked Devices → Link a Device → scan the code above.",
+          false,
         );
       });
 
-      // ── WhatsApp status updates ────────────────
+      // ── WhatsApp status updates ────────────────────
       socket.on("whatsapp_status", ({ status, message }) => {
+        debugBar.textContent = `Status: ${status}`;
+
         switch (status) {
           case "ready":
-            qrImage.style.display = "none";
-            placeholder.innerHTML =
-              '<div style="font-size:64px">✅</div><span>Connected!</span>';
-            placeholder.style.display = "flex";
+            showSuccess();
             setStatus(
-              "ready",
-              "● Connected",
-              "WhatsApp is connected and ready to send messages.",
+              "s-ready",
+              "✅ Connected",
+              "WhatsApp is connected and ready to send messages!",
+              false,
             );
             break;
+
           case "authenticated":
+            showSpinner("Loading WhatsApp...");
             setStatus(
-              "scanning",
-              "Authenticated",
+              "s-scanning",
+              "🔐 Authenticated",
               "Session saved. Loading WhatsApp...",
+              false,
             );
             break;
-          case "auth_failure":
-            setStatus(
-              "error",
-              "Auth Failed",
-              message || "Authentication failed. Please reload and try again.",
-            );
-            break;
-          case "disconnected":
-            setStatus(
-              "error",
-              "Disconnected",
-              message || "Connection lost. Attempting to reconnect...",
-            );
-            break;
-          case "reconnecting":
-            setStatus(
-              "waiting",
-              "Reconnecting...",
-              message || "Trying to reconnect...",
-            );
-            break;
+
           case "initializing":
+            showSpinner("Initializing...");
             setStatus(
-              "waiting",
+              "s-waiting",
               "Initializing...",
-              "Starting WhatsApp client...",
+              "Starting WhatsApp client. QR will appear shortly.",
+              false,
             );
             break;
+
+          case "auth_failure":
+            showSpinner("Auth failed");
+            setStatus(
+              "s-error",
+              "❌ Auth Failed",
+              "Authentication failed. Click retry below.",
+              true,
+            );
+            break;
+
+          case "disconnected":
+            if (!qrReceived) showSpinner("Reconnecting...");
+            setStatus(
+              "s-error",
+              "⚠️ Disconnected",
+              message || "Connection lost. Attempting to reconnect...",
+              false,
+            );
+            break;
+
+          case "reconnecting":
+            showSpinner("Reconnecting...");
+            setStatus(
+              "s-waiting",
+              "🔄 Reconnecting",
+              message || "Trying to reconnect...",
+              false,
+            );
+            break;
+
+          case "not_initialized":
+            showSpinner("Starting...");
+            setStatus(
+              "s-waiting",
+              "Starting...",
+              "WhatsApp client is starting up.",
+              false,
+            );
+            // Auto retry after 3s
+            setTimeout(requestQR, 3000);
+            break;
+
           default:
-            setStatus("waiting", status, message || "");
+            setStatus("s-waiting", status, message || "", false);
         }
       });
 
+      // ── Socket connect ─────────────────────────────
       socket.on("connect", () => {
+        debugBar.textContent = `Socket connected ✓ (id: ${socket.id})`;
         setStatus(
-          "waiting",
+          "s-waiting",
           "Connected to server",
           "Waiting for WhatsApp QR code...",
+          false,
         );
+        // Request status immediately — server will also push cached QR if available
         socket.emit("get_status");
       });
 
+      // ── Socket disconnect ──────────────────────────
       socket.on("disconnect", () => {
+        debugBar.textContent = "Socket disconnected ✗";
         setStatus(
-          "error",
-          "Server disconnected",
-          "Lost connection to the backend server.",
+          "s-error",
+          "🔌 Server disconnected",
+          "Lost connection to backend server. Refresh the page.",
+          false,
         );
       });
+
+      socket.on("connect_error", (err) => {
+        debugBar.textContent = `Connection error: ${err.message}`;
+        setStatus(
+          "s-error",
+          "❌ Connection error",
+          `Cannot reach server: ${err.message}`,
+          true,
+        );
+      });
+
+      // ── Auto-poll fallback via REST ────────────────
+      // If socket works but QR never arrives after 8s, poll REST endpoint
+      setTimeout(async () => {
+        if (qrReceived) return;
+        debugBar.textContent += " | Trying REST fallback...";
+        try {
+          const res = await fetch("/api/whatsapp/qr");
+          const data = await res.json();
+          if (data.success && data.data.qrAvailable) {
+            showQR(data.data.qrImage);
+            setStatus(
+              "s-scanning",
+              "📷 Scan QR Code",
+              "Open WhatsApp → Linked Devices → Link a Device → scan above.",
+              false,
+            );
+            debugBar.textContent += " | Got QR via REST ✓";
+          }
+        } catch (e) {
+          debugBar.textContent += " | REST fallback failed";
+        }
+      }, 8000);
     </script>
   </body>
 </html>

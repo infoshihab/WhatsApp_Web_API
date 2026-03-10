@@ -1,4 +1,4 @@
-const { createLogger, format, transports } = require("winston");
+const { createLogger, format, transports, addColors } = require("winston");
 const path = require("path");
 const fs = require("fs");
 
@@ -8,50 +8,59 @@ if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir, { recursive: true });
 }
 
-// Custom log format
-const logFormat = format.combine(
+// ── Add custom 'http' level ────────────────────
+const customLevels = {
+  levels: { error: 0, warn: 1, info: 2, http: 3, debug: 4 },
+  colors: {
+    error: "red",
+    warn: "yellow",
+    info: "green",
+    http: "magenta",
+    debug: "white",
+  },
+};
+addColors(customLevels.colors);
+
+// ── Console format (colorized) ─────────────────
+const consoleFormat = format.combine(
   format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  format.colorize({ all: true }),
   format.errors({ stack: true }),
   format.printf(({ timestamp, level, message, stack, ...meta }) => {
-    let log = `[${timestamp}] [${level.toUpperCase()}]: ${message}`;
-    if (Object.keys(meta).length > 0) {
-      log += ` | ${JSON.stringify(meta)}`;
-    }
-    if (stack) {
-      log += `\n${stack}`;
-    }
+    let log = `[${timestamp}] [${level}]: ${message}`;
+    if (Object.keys(meta).length > 0) log += ` | ${JSON.stringify(meta)}`;
+    if (stack) log += `\n${stack}`;
     return log;
   }),
 );
 
-// JSON format for file logs
-const jsonFormat = format.combine(
+// ── File format (JSON) ─────────────────────────
+const fileFormat = format.combine(
   format.timestamp(),
   format.errors({ stack: true }),
   format.json(),
 );
 
 const logger = createLogger({
-  level: process.env.LOG_LEVEL || "info",
+  levels: customLevels.levels,
+  level: process.env.LOG_LEVEL || "http", // capture http logs too
   transports: [
-    // Console transport — colored output
-    new transports.Console({
-      format: format.combine(format.colorize({ all: true }), logFormat),
-    }),
+    // Console — colorized
+    new transports.Console({ format: consoleFormat }),
 
-    // File transport — all logs
+    // File — all logs
     new transports.File({
       filename: path.join(logDir, "app.log"),
-      format: jsonFormat,
+      format: fileFormat,
       maxsize: 5 * 1024 * 1024, // 5MB
       maxFiles: 5,
     }),
 
-    // File transport — error logs only
+    // File — errors only
     new transports.File({
       filename: path.join(logDir, "error.log"),
       level: "error",
-      format: jsonFormat,
+      format: fileFormat,
       maxsize: 5 * 1024 * 1024,
       maxFiles: 5,
     }),

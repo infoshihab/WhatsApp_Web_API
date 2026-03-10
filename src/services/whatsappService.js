@@ -3,27 +3,28 @@ const qrcode = require("qrcode");
 const logger = require("../config/logger");
 
 // ─────────────────────────────────────────────
-//  Singleton: only one WhatsApp client instance
+//  Singleton state
 // ─────────────────────────────────────────────
 let client = null;
 let isReady = false;
 let isInitializing = false;
 let retryCount = 0;
-let socketIo = null; // Will be injected from socketHandler
+let socketIo = null;
+let latestQR = null; // { qrImage, qrString, generatedAt }
 
 const MAX_RETRIES = parseInt(process.env.MAX_RETRIES) || 5;
 const RETRY_DELAY = parseInt(process.env.RETRY_DELAY) || 5000;
 const SESSION_PATH = process.env.SESSION_PATH || "./session";
 
 // ─────────────────────────────────────────────
-//  Inject Socket.IO instance (called from app.js)
+//  Inject Socket.IO instance
 // ─────────────────────────────────────────────
 const setSocketIo = (io) => {
   socketIo = io;
 };
 
 // ─────────────────────────────────────────────
-//  Emit event to all connected socket clients
+//  Emit to all connected Socket.IO clients
 // ─────────────────────────────────────────────
 const emitToClients = (event, data) => {
   if (socketIo) {
@@ -42,14 +43,12 @@ const initializeClient = () => {
 
   isInitializing = true;
   isReady = false;
+  latestQR = null;
 
   logger.info("Initializing WhatsApp client...");
 
   client = new Client({
-    // LocalAuth saves session to disk so re-auth is not needed after restart
-    authStrategy: new LocalAuth({
-      dataPath: SESSION_PATH,
-    }),
+    authStrategy: new LocalAuth({ dataPath: SESSION_PATH }),
     puppeteer: {
       headless: true,
       args: [
@@ -64,26 +63,35 @@ const initializeClient = () => {
     },
   });
 
-  // ── EVENT: QR Code generated ──────────────────
+  // ── QR Code generated ─────────────────────
   client.on("qr", async (qr) => {
     logger.info("QR Code received. Waiting for scan...");
     retryCount = 0;
 
     try {
-      // Convert raw QR string to base64 PNG image
       const qrImage = await qrcode.toDataURL(qr);
+
+      // Store latest QR for REST fallback endpoint
+      latestQR = {
+        qrImage,
+        qrString: qr,
+        generatedAt: new Date().toISOString(),
+      };
+
       emitToClients("qr", { qrImage, qrString: qr });
-      logger.info("QR Code emitted to connected clients via Socket.IO");
+      logger.info("QR Code emitted to Socket.IO clients.");
     } catch (err) {
       logger.error("Failed to generate QR image", { error: err.message });
     }
   });
 
-  // ── EVENT: Client is ready ─────────────────────
+  // ── Ready ─────────────────────────────────
   client.on("ready", () => {
     isReady = true;
     isInitializing = false;
     retryCount = 0;
+    latestQR = null; // Clear QR — no longer needed
+
     logger.info("✅ WhatsApp client is READY!");
     emitToClients("whatsapp_status", {
       status: "ready",
@@ -91,7 +99,7 @@ const initializeClient = () => {
     });
   });
 
-  // ── EVENT: Authenticated ───────────────────────
+  // ── Authenticated ─────────────────────────
   client.on("authenticated", () => {
     logger.info("✅ WhatsApp authenticated. Session saved.");
     emitToClients("whatsapp_status", {
@@ -100,10 +108,11 @@ const initializeClient = () => {
     });
   });
 
-  // ── EVENT: Authentication failed ──────────────
+  // ── Auth Failure ──────────────────────────
   client.on("auth_failure", (msg) => {
     isReady = false;
     isInitializing = false;
+
     logger.error("❌ Authentication failed", { message: msg });
     emitToClients("whatsapp_status", {
       status: "auth_failure",
@@ -111,21 +120,21 @@ const initializeClient = () => {
     });
   });
 
-  // ── EVENT: Disconnected ────────────────────────
+  // ── Disconnected ──────────────────────────
   client.on("disconnected", (reason) => {
     isReady = false;
     isInitializing = false;
+
     logger.warn("⚠️  WhatsApp disconnected", { reason });
     emitToClients("whatsapp_status", {
       status: "disconnected",
       message: `Disconnected: ${reason}`,
     });
 
-    // Auto-reconnect logic
     handleReconnect();
   });
 
-  // ── Initialize the client ──────────────────────
+  // ── Initialize ────────────────────────────
   client.initialize().catch((err) => {
     isInitializing = false;
     isReady = false;
@@ -135,7 +144,7 @@ const initializeClient = () => {
 };
 
 // ─────────────────────────────────────────────
-//  Auto Reconnect Handler
+//  Auto Reconnect with exponential backoff
 // ─────────────────────────────────────────────
 const handleReconnect = () => {
   if (retryCount >= MAX_RETRIES) {
@@ -148,24 +157,38 @@ const handleReconnect = () => {
   }
 
   retryCount++;
-  const delay = RETRY_DELAY * retryCount; // exponential-style backoff
+  const delay = RETRY_DELAY * retryCount;
 
   logger.info(
     `Reconnecting in ${delay / 1000}s... (Attempt ${retryCount}/${MAX_RETRIES})`,
   );
-
   emitToClients("whatsapp_status", {
     status: "reconnecting",
     message: `Reconnecting... Attempt ${retryCount} of ${MAX_RETRIES}`,
   });
 
   setTimeout(() => {
-    // Destroy old client before creating new one
-    if (client) {
-      client.destroy().catch(() => {});
-    }
+    if (client) client.destroy().catch(() => {});
     initializeClient();
   }, delay);
+};
+
+// ─────────────────────────────────────────────
+//  Manual Restart (called from controller)
+// ─────────────────────────────────────────────
+const restartClient = async () => {
+  logger.info("Manual restart triggered.");
+  isReady = false;
+  isInitializing = false;
+  retryCount = 0;
+  latestQR = null;
+
+  if (client) {
+    await client.destroy().catch(() => {});
+    client = null;
+  }
+
+  initializeClient();
 };
 
 // ─────────────────────────────────────────────
@@ -178,49 +201,37 @@ const sendMessage = async (phone, message) => {
     );
   }
 
-  // Format phone number: remove +, spaces, dashes
-  // whatsapp-web.js needs format: 8801XXXXXXXXX@c.us
   const formattedPhone = formatPhoneNumber(phone);
-
   logger.info("Sending message", { to: formattedPhone });
 
-  try {
-    // Check if number exists on WhatsApp
-    const isRegistered = await client.isRegisteredUser(formattedPhone);
-    if (!isRegistered) {
-      throw new Error(`Phone number ${phone} is not registered on WhatsApp.`);
-    }
-
-    const response = await client.sendMessage(formattedPhone, message);
-
-    logger.info("Message sent successfully", {
-      to: phone,
-      messageId: response.id._serialized,
-    });
-
-    return {
-      messageId: response.id._serialized,
-      to: phone,
-      timestamp: new Date().toISOString(),
-    };
-  } catch (err) {
-    logger.error("Failed to send message", { to: phone, error: err.message });
-    throw err;
+  // Verify number is on WhatsApp
+  const isRegistered = await client.isRegisteredUser(formattedPhone);
+  if (!isRegistered) {
+    throw new Error(`Phone number ${phone} is not registered on WhatsApp.`);
   }
+
+  const response = await client.sendMessage(formattedPhone, message);
+
+  logger.info("Message sent successfully", {
+    to: phone,
+    messageId: response.id._serialized,
+  });
+
+  return {
+    messageId: response.id._serialized,
+    to: phone,
+    timestamp: new Date().toISOString(),
+  };
 };
 
 // ─────────────────────────────────────────────
-//  Format phone number for WhatsApp
+//  Helpers
 // ─────────────────────────────────────────────
 const formatPhoneNumber = (phone) => {
-  // Remove all non-digit characters
   const digits = phone.toString().replace(/\D/g, "");
   return `${digits}@c.us`;
 };
 
-// ─────────────────────────────────────────────
-//  Get current connection status
-// ─────────────────────────────────────────────
 const getStatus = () => {
   if (!client) return "not_initialized";
   if (isInitializing) return "initializing";
@@ -230,10 +241,14 @@ const getStatus = () => {
 
 const isClientReady = () => isReady;
 
+const getLatestQR = () => latestQR;
+
 module.exports = {
   initializeClient,
+  restartClient,
   sendMessage,
   getStatus,
   isClientReady,
+  getLatestQR,
   setSocketIo,
 };
