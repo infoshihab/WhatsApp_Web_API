@@ -1,3 +1,6 @@
-2026/03/10-23:08:18.429 3aac Reusing MANIFEST D:\task\WhatsApp_Web_API\session\session\Default\Local Storage\leveldb/MANIFEST-000001
-2026/03/10-23:08:18.434 3aac Recovering log #3
-2026/03/10-23:08:18.437 3aac Reusing old log D:\task\WhatsApp_Web_API\session\session\Default\Local Storage\leveldb/000003.log 
+2026/03/10-23:54:52.439 514c Reusing MANIFEST D:\task\WhatsApp_Web_API\session\session\Default\Local Storage\leveldb/MANIFEST-000001
+2026/03/10-23:54:52.447 514c Recovering log #3
+2026/03/10-23:54:52.455 514c Reusing old log D:\task\WhatsApp_Web_API\session\session\Default\Local Storage\leveldb/000003.log 
+2026/03/10-23:56:53.213 1db8 Level-0 table #5: started
+2026/03/10-23:56:53.221 1db8 Level-0 table #5: 29142 bytes OK
+2026/03/10-23:56:53.224 1db8 Delete type=0 #3

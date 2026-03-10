@@ -49,10 +49,9 @@
         background: #fff;
         border-radius: 12px;
         padding: 16px;
-        display: inline-block;
-        margin-bottom: 20px;
-        min-width: 252px;
-        min-height: 252px;
+        width: 252px;
+        height: 252px;
+        margin: 0 auto 20px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -69,7 +68,7 @@
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
       }
       .spinner {
         width: 44px;
@@ -85,7 +84,7 @@
         }
       }
       .spinner-label {
-        font-size: 13px;
+        font-size: 12px;
         color: #8696a0;
       }
 
@@ -97,14 +96,13 @@
         border-radius: 20px;
         font-size: 13px;
         font-weight: 500;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
       }
       .dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
       }
-
       .s-waiting {
         background: #2a3942;
         color: #8696a0;
@@ -134,7 +132,6 @@
       .s-error .dot {
         background: #f15c6d;
       }
-
       @keyframes pulse {
         0%,
         100% {
@@ -148,12 +145,11 @@
       #statusMsg {
         font-size: 13px;
         color: #8696a0;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         line-height: 1.6;
       }
 
-      .retry-btn {
-        display: none;
+      .btn {
         background: #00a884;
         color: #fff;
         border: none;
@@ -163,7 +159,7 @@
         cursor: pointer;
         margin-bottom: 16px;
       }
-      .retry-btn:hover {
+      .btn:hover {
         background: #00c49a;
       }
 
@@ -186,12 +182,11 @@
         color: #aebac1;
         line-height: 2.2;
       }
-
       .debug-bar {
-        margin-top: 16px;
+        margin-top: 14px;
         font-size: 11px;
         color: #3d5260;
-        text-align: center;
+        font-family: monospace;
       }
     </style>
   </head>
@@ -209,17 +204,19 @@
         </div>
       </div>
 
-      <br />
-
       <div class="status-badge s-waiting" id="statusBadge">
         <div class="dot"></div>
-        <span id="statusText">Connecting to server...</span>
+        <span id="statusText">Connecting...</span>
       </div>
 
       <p id="statusMsg">Please wait while we initialize WhatsApp.</p>
-
-      <button class="retry-btn" id="retryBtn" onclick="requestQR()">
-        🔄 Request QR Again
+      <button
+        class="btn"
+        id="refreshBtn"
+        onclick="manualRefresh()"
+        style="display: none"
+      >
+        🔄 Refresh QR
       </button>
 
       <div class="instructions">
@@ -232,66 +229,117 @@
           <li>Point your phone at the QR code above</li>
         </ol>
       </div>
-
-      <div class="debug-bar" id="debugBar">Socket: connecting...</div>
+      <div class="debug-bar" id="debugBar">⏳ Initializing...</div>
     </div>
 
     <script>
-      const socket = io({ transports: ["websocket", "polling"] });
+      // ── All listeners registered BEFORE socket connects ──
       const qrImg = document.getElementById("qrImage");
       const placeholder = document.getElementById("placeholder");
       const spinnerLabel = document.getElementById("spinnerLabel");
       const badge = document.getElementById("statusBadge");
       const statusText = document.getElementById("statusText");
       const statusMsg = document.getElementById("statusMsg");
-      const retryBtn = document.getElementById("retryBtn");
+      const refreshBtn = document.getElementById("refreshBtn");
       const debugBar = document.getElementById("debugBar");
 
       let qrReceived = false;
 
-      // ── Helpers ───────────────────────────────────
+      function log(msg) {
+        debugBar.textContent = "🔹 " + msg;
+        console.log("[WA-DEBUG]", msg);
+      }
+
       function showQR(src) {
         qrImg.src = src;
         qrImg.style.display = "block";
         placeholder.style.display = "none";
         qrReceived = true;
-        retryBtn.style.display = "none";
+        refreshBtn.style.display = "none";
+        log("QR displayed ✓");
       }
 
       function showSpinner(label) {
         qrImg.style.display = "none";
         placeholder.style.display = "flex";
-        spinnerLabel.textContent = label || "Please wait...";
+        placeholder.innerHTML = `<div class="spinner"></div><span class="spinner-label">${label}</span>`;
       }
 
-      function showSuccess() {
+      function showDone() {
         qrImg.style.display = "none";
-        placeholder.innerHTML =
-          '<div style="font-size:64px">✅</div><span style="color:#00a884;font-size:15px;font-weight:600">Connected!</span>';
         placeholder.style.display = "flex";
+        placeholder.innerHTML =
+          '<div style="font-size:56px">✅</div><span style="color:#00a884;font-weight:600;font-size:14px">Connected!</span>';
       }
 
-      function setStatus(cls, text, msg, showRetry) {
+      function setStatus(cls, text, msg, showRefresh) {
         badge.className = `status-badge ${cls}`;
         statusText.textContent = text;
         statusMsg.textContent = msg;
-        retryBtn.style.display = showRetry ? "inline-block" : "none";
+        refreshBtn.style.display = showRefresh ? "inline-block" : "none";
       }
 
-      function requestQR() {
-        socket.emit("get_status");
+      function manualRefresh() {
+        log("Manual refresh requested...");
         showSpinner("Requesting QR...");
         setStatus(
           "s-waiting",
           "Requesting QR...",
-          "Asking server for a fresh QR code.",
+          "Fetching a fresh QR code.",
           false,
         );
+        socket.emit("get_status");
       }
 
-      // ── QR Code received ───────────────────────────
+      // ── REST fallback ──────────────────────────────
+      async function fetchQRviaREST() {
+        try {
+          log("Trying REST fallback /api/whatsapp/qr...");
+          const res = await fetch("/api/whatsapp/qr");
+          const data = await res.json();
+          if (data.success && data.data && data.data.qrAvailable) {
+            showQR(data.data.qrImage);
+            setStatus(
+              "s-scanning",
+              "📷 Scan QR Code",
+              "Open WhatsApp → Linked Devices → Link a Device → scan above.",
+              false,
+            );
+            log("QR loaded via REST ✓");
+            return true;
+          } else if (data.data && data.data.status === "ready") {
+            showDone();
+            setStatus(
+              "s-ready",
+              "✅ Already Connected",
+              "WhatsApp is already connected!",
+              false,
+            );
+            return true;
+          }
+        } catch (e) {
+          log("REST fallback failed: " + e.message);
+        }
+        return false;
+      }
+
+      // ── Initialize Socket AFTER all functions defined ──
+      const socket = io({ transports: ["websocket", "polling"] });
+
+      socket.on("connect", () => {
+        log(`Socket connected ✓ id=${socket.id}`);
+        setStatus(
+          "s-waiting",
+          "Connected to server",
+          "Waiting for QR code...",
+          false,
+        );
+        // Request status after small delay so server-side also settles
+        setTimeout(() => socket.emit("get_status"), 300);
+      });
+
       socket.on("qr", ({ qrImage }) => {
-        debugBar.textContent = "QR received ✓";
+        log("QR event received via Socket.IO ✓");
         showQR(qrImage);
         setStatus(
           "s-scanning",
@@ -301,144 +349,98 @@
         );
       });
 
-      // ── WhatsApp status updates ────────────────────
       socket.on("whatsapp_status", ({ status, message }) => {
-        debugBar.textContent = `Status: ${status}`;
-
+        log(`Status update: ${status}`);
         switch (status) {
           case "ready":
-            showSuccess();
+            showDone();
             setStatus(
               "s-ready",
               "✅ Connected",
-              "WhatsApp is connected and ready to send messages!",
+              "WhatsApp is connected and ready!",
               false,
             );
             break;
-
           case "authenticated":
             showSpinner("Loading WhatsApp...");
             setStatus(
               "s-scanning",
               "🔐 Authenticated",
-              "Session saved. Loading WhatsApp...",
+              "Session saved. Loading...",
               false,
             );
             break;
-
           case "initializing":
             showSpinner("Initializing...");
             setStatus(
               "s-waiting",
               "Initializing...",
-              "Starting WhatsApp client. QR will appear shortly.",
+              "WhatsApp client is starting up. QR coming soon...",
               false,
             );
             break;
-
           case "auth_failure":
             showSpinner("Auth failed");
             setStatus(
               "s-error",
               "❌ Auth Failed",
-              "Authentication failed. Click retry below.",
+              "Please restart the server and try again.",
               true,
             );
             break;
-
           case "disconnected":
             if (!qrReceived) showSpinner("Reconnecting...");
             setStatus(
               "s-error",
               "⚠️ Disconnected",
-              message || "Connection lost. Attempting to reconnect...",
+              message || "Reconnecting...",
               false,
             );
             break;
-
           case "reconnecting":
             showSpinner("Reconnecting...");
             setStatus(
               "s-waiting",
               "🔄 Reconnecting",
-              message || "Trying to reconnect...",
+              message || "Please wait...",
               false,
             );
             break;
-
-          case "not_initialized":
-            showSpinner("Starting...");
-            setStatus(
-              "s-waiting",
-              "Starting...",
-              "WhatsApp client is starting up.",
-              false,
-            );
-            // Auto retry after 3s
-            setTimeout(requestQR, 3000);
-            break;
-
           default:
             setStatus("s-waiting", status, message || "", false);
         }
       });
 
-      // ── Socket connect ─────────────────────────────
-      socket.on("connect", () => {
-        debugBar.textContent = `Socket connected ✓ (id: ${socket.id})`;
-        setStatus(
-          "s-waiting",
-          "Connected to server",
-          "Waiting for WhatsApp QR code...",
-          false,
-        );
-        // Request status immediately — server will also push cached QR if available
-        socket.emit("get_status");
-      });
-
-      // ── Socket disconnect ──────────────────────────
       socket.on("disconnect", () => {
-        debugBar.textContent = "Socket disconnected ✗";
+        log("Socket disconnected ✗");
         setStatus(
           "s-error",
           "🔌 Server disconnected",
-          "Lost connection to backend server. Refresh the page.",
+          "Lost connection. Please refresh the page.",
           false,
         );
       });
 
       socket.on("connect_error", (err) => {
-        debugBar.textContent = `Connection error: ${err.message}`;
-        setStatus(
-          "s-error",
-          "❌ Connection error",
-          `Cannot reach server: ${err.message}`,
-          true,
-        );
+        log("Connection error: " + err.message);
+        setStatus("s-error", "❌ Cannot connect", `${err.message}`, true);
       });
 
-      // ── Auto-poll fallback via REST ────────────────
-      // If socket works but QR never arrives after 8s, poll REST endpoint
+      // ── Fallback: poll REST if no QR after 6 seconds ──
       setTimeout(async () => {
         if (qrReceived) return;
-        debugBar.textContent += " | Trying REST fallback...";
-        try {
-          const res = await fetch("/api/whatsapp/qr");
-          const data = await res.json();
-          if (data.success && data.data.qrAvailable) {
-            showQR(data.data.qrImage);
-            setStatus(
-              "s-scanning",
-              "📷 Scan QR Code",
-              "Open WhatsApp → Linked Devices → Link a Device → scan above.",
-              false,
-            );
-            debugBar.textContent += " | Got QR via REST ✓";
-          }
-        } catch (e) {
-          debugBar.textContent += " | REST fallback failed";
+        log("6s passed, no QR via socket — trying REST...");
+        const got = await fetchQRviaREST();
+        if (!got) {
+          setStatus(
+            "s-waiting",
+            "Still waiting...",
+            "QR is taking longer than usual. Click Refresh QR.",
+            true,
+          );
+          log("No QR yet — showing manual refresh button");
         }
-      }, 8000);
+      }, 6000);
     </script>
   </body>
 </html>
